@@ -115,6 +115,6 @@ run_in_context <- function(script='', call=test_function, args_in=list(), rng_se
 
 test_function <- function()
 {
-    cat("Hello world!\n")
+    cat("Test function called successfully!\n")
 }
 
