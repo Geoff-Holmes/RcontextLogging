@@ -101,7 +101,7 @@ run_in_context <- function(script=0, call=test_function, rng_seed=0, git_check_t
     # tidy up
     rm(list=c("pc_info", "packages"))
 
-    context$start_time=Sys.time()
+    context$start_time<-Sys.time()
     set.seed(rng_seed)
     {
         if (script)
@@ -110,7 +110,7 @@ run_in_context <- function(script=0, call=test_function, rng_seed=0, git_check_t
         }
         do.call(call, list())
     }
-    context$end_time  =Sys.time()
+    context$end_time<-Sys.time()
 }
 
 test_function <- function()
