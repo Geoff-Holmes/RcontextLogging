@@ -10,6 +10,8 @@ run_in_context <- function(script='', call='', args_in=list(), rng_seed=0, save_
     # 10/01/2018
     #
     # script is name of R code to run
+    # call is the name of any fucntion to call - usually defined in script
+    # args_in are any arguments to pass to call in a list
     # rng_seed # seed value for random number generator
     # git_check_timeout_time=1000 # adjust if latency requires it : default 1000
     # git_check_sleep_time  = .25 # as above                      : default .25
@@ -112,6 +114,7 @@ run_in_context <- function(script='', call='', args_in=list(), rng_seed=0, save_
             if (nchar(call))
             {
                 context$call <- call
+                context$args_in <-args_in
                 context$result<-do.call(call, args_in)
             }
         } else {

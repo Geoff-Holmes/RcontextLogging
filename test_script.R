@@ -4,8 +4,8 @@ x<-runif(10)
 plot(x)
 cat("hello everyone!\n")
 
-extra_stuff<-function()
+extra_stuff<-function(x1, x2)
 {
-    cat("\nextra processing")
-    x<-1
+    cat("\nextra processing\n\n")
+    return(x1+x2)
 }
