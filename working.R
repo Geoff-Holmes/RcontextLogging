@@ -33,23 +33,23 @@ run_with_logging <- function(
     stop_quietly <- function(msg, extra_msg='') {
         opt <- options(show.error.messages = FALSE)
         on.exit(options(opt))
-        context$msg <<- sprintf("Aborted: %s", msg)
+        log_info$msg <<- sprintf("Aborted: %s", msg)
         cat(msg)
         cat(extra_msg)
         stop()
     }
 
-    # initialise for saving context info
-    context <- list()
+    # initialise for saving log_info info
+    log_info <- list()
 
     # get pc info
     pc_info <-Sys.info()
-    context$pc_info <-sprintf("Running on %s, %s %s %s, machine: %s, logged in as %s",
+    log_info$pc_info <-sprintf("Running on %s, %s %s %s, machine: %s, logged in as %s",
     	pc_info["sysname"],pc_info["release"],pc_info["version"],
     	pc_info["machine"],pc_info["nodename"],pc_info["user"])
 
     # R and package info
-    context$R_version<-R.version.string
+    log_info$R_version<-R.version.string
 
     # get all curently loaded packages
     packages <- (.packages())
@@ -57,8 +57,8 @@ run_with_logging <- function(
     pk <- packages[k]
     packages[k]<-sprintf("%s version %s", pk, packageVersion(pk))
     }
-    context$package_info <- packages
-    context$wd <- getwd()
+    log_info$package_info <- packages
+    log_info$wd <- getwd()
 
     # get git info
     # open shell
@@ -83,7 +83,7 @@ run_with_logging <- function(
     {
         if (tmp[2]=="") # if not clean a diff hash should show here
         {
-        	context$git_status<-"working tree is confirmed clean"
+        	log_info$git_status<-"working tree is confirmed clean"
         	# check for untracked files
             process_write(handle, "git status\n")
             # give the subprocess a bit of time to complete
@@ -94,9 +94,9 @@ run_with_logging <- function(
             {
                 if (tmp[3]=="Untracked files:")
                 {
-                    context$git_status=paste(context$git_status, "but there are untracked files")
+                    log_info$git_status=paste(log_info$git_status, "but there are untracked files")
                     cat("WARNING: there are untracked files\nContinuing - but check that all used files are tracked\n")
-                    context$git_branch=tmp[2]
+                    log_info$git_branch=tmp[2]
                 }
             } else {
                 error_flag=1
@@ -105,8 +105,8 @@ run_with_logging <- function(
         	process_write(handle, "git rev-parse HEAD\n")
             # give the subprocess a bit of time to complete
             Sys.sleep(git_check_sleep_time)
-        	context$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)[2]
-        	if (nchar(context$git_commit_ref)!=40) {
+        	log_info$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)[2]
+        	if (nchar(log_info$git_commit_ref)!=40) {
         	    error_flag=1
         	}
         } else {
@@ -124,40 +124,40 @@ run_with_logging <- function(
     }
 
     # store random seed
-    context$rng_seed<-rng_seed
+    log_info$rng_seed<-rng_seed
 
     # tidy up
     rm(list=c("pc_info", "packages"))
 
-    context$start_time<-Sys.time()
+    log_info$start_time<-Sys.time()
     set.seed(rng_seed)
     {
         # if user has supplied a script run script and any chosen function
         if (nchar(script))
         {
-            context$script <- script
+            log_info$script <- script
             source(script)
             if (nchar(call))
             {
-                context$call <- call
-                context$args_in <-args_in
-                context$result<-do.call(call, args_in)
+                log_info$call <- call
+                log_info$args_in <-args_in
+                log_info$result<-do.call(call, args_in)
             }
         } else {
-            context$call<-'test_function'
-            context$result<-test_function()
+            log_info$call<-'test_function'
+            log_info$result<-test_function()
         }
     }
-    context$end_time<-Sys.time()
+    log_info$end_time<-Sys.time()
     if(!nchar(save_file))
     {
-        save_file<-sprintf("Result_%s_%s_%s.RData", script, call, context$end_time)
+        save_file<-sprintf("Result_%s_%s_%s.RData", script, call, log_info$end_time)
         save_file<-gsub(':', '-', save_file)
     }
-    context$save_file<-save_file
-    save(context, file=save_file)
+    log_info$save_file<-save_file
+    save(log_info, file=save_file)
     cat("\n")
-    print(context)
+    print(log_info)
 }
 
 test_function <- function()
