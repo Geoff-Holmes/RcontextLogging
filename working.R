@@ -1,4 +1,12 @@
-run_in_context <- function(script='', call='', args_in=list(), rng_seed=0, save_file='', git_check_timeout_time=1000, git_check_sleep_time=.25)
+run_with_logging <- function(
+                                script='',
+                                call='',
+                                args_in=list(),
+                                rng_seed=0,
+                                save_file='',
+                                git_check_timeout_time=1000,
+                                git_check_sleep_time=.25
+                            )
 {
     # code in development for logging context info for research code
     # inspiration from Benureau (2018) Re-run, Repeat, Reproduce, Reuse, Replicate:
@@ -9,12 +17,13 @@ run_in_context <- function(script='', call='', args_in=list(), rng_seed=0, save_
     #
     # 10/01/2018
     #
-    # script is name of R code to run
-    # call is the name of any fucntion to call - usually defined in script
-    # args_in are any arguments to pass to call in a list
-    # rng_seed # seed value for random number generator
-    # git_check_timeout_time=1000 # adjust if latency requires it : default 1000
-    # git_check_sleep_time  = .25 # as above                      : default .25
+    # ARGUMENTS:
+    # script                        : name of R code to run
+    # call                          : name of any function to call - usually defined in script
+    # args_in                       : any arguments to pass to call in a list
+    # rng_seed                      : seed value for random number generator : default 0
+    # git_check_timeout_time=1000   : adjust if latency requires it : default 1000
+    # git_check_sleep_time  = .25   : as above                      : default .25
 
     # library to enable interaction with git
     # install.packages("subprocess") # if not already installed
