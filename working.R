@@ -96,6 +96,7 @@ run_with_logging <- function(
                 {
                     log_info$git_status=paste(log_info$git_status, "but there are untracked files")
                     cat("WARNING: there are untracked files\nContinuing - but check that all used files are tracked\n")
+                    Sys.sleep(0.5)
                     log_info$git_branch=tmp[2]
                 }
             } else {
@@ -156,7 +157,7 @@ run_with_logging <- function(
     }
     log_info$save_file<-save_file
     save(log_info, file=save_file)
-    cat("\n")
+    cat("\nlog_info:\n\n")
     print(log_info)
 }
 
