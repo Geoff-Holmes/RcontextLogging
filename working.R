@@ -11,10 +11,12 @@
 # install.packages("subprocess") # if not already installed
 library(subprocess)
 
-# useful function https://tolstoy.newcastle.edu.au/R/e5/help/08/11/6953.html
-stop_quietly <- function() {
+# useful function based on https://tolstoy.newcastle.edu.au/R/e5/help/08/11/6953.html
+stop_quietly <- function(msg) {
     opt <- options(show.error.messages = FALSE)
     on.exit(options(opt))
+    context$msg <<- sprintf("Aborted: %s", msg)
+    cat(msg)
     stop()
 }
 
@@ -23,7 +25,7 @@ context <- list()
 
 # get pc info
 pc_info <-Sys.info()
-context$pc_info <-sprintf("Running on %s, %s %s %s, %s, logged in as %s",
+context$pc_info <-sprintf("Running on %s, %s %s %s, machine: %s, logged in as %s",
 	pc_info["sysname"],pc_info["release"],pc_info["version"],
 	pc_info["machine"],pc_info["nodename"],pc_info["user"])
 
@@ -67,16 +69,16 @@ if (
     	process_write(handle, "git rev-parse HEAD\n")
     	context$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=t_out)[2]
     	if (nchar(context$git_commit_ref)!=40) {
-    	    cat("git hash not stored correctly: please try again")
-            stop_quietly()
+    	    msg<-"git hash not stored correctly: please try again"
+            stop_quietly(msg)
     	}
     } else {
-    	cat("git is not clean: please commit first")
-        stop_quietly()
+    	msg<-"git is not clean: please commit first"
+        context<-stop_quietly(msg)
     }
 } else {
-    cat("git check did not complete properly: please try again")
-    stop_quietly()
+    msg<-"git check did not complete properly: please try again"
+    stop_quietly(msg)
 }
 
 # tidy up
