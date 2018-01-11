@@ -51,13 +51,6 @@ run_with_logging <- function(
     # R and package info
     log_info$R_version<-R.version.string
 
-    # get all curently loaded packages
-    packages <- (.packages())
-    for (k in 1:length(packages)) {
-    pk <- packages[k]
-    packages[k]<-sprintf("%s version %s", pk, packageVersion(pk))
-    }
-    log_info$package_info <- packages
     log_info$wd <- getwd()
 
     # get git info
@@ -150,6 +143,15 @@ run_with_logging <- function(
         }
     }
     log_info$end_time<-Sys.time()
+
+    # get all curently loaded packages
+    packages <- (.packages())
+    for (k in 1:length(packages)) {
+        pk <- packages[k]
+        packages[k]<-sprintf("%s version %s", pk, packageVersion(pk))
+    }
+    log_info$package_info <- packages
+
     if(!nchar(save_file))
     {
         save_file<-sprintf("Result_%s_%s_%s.RData", script, call, log_info$end_time)
