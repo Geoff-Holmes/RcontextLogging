@@ -7,4 +7,5 @@ cat("hello everyone!\n")
 extra_stuff<-function()
 {
     cat("\nextra processing")
+    x<-1
 }

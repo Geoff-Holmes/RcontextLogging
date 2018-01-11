@@ -1,4 +1,4 @@
-run_in_context <- function(script='', call=test_function, args_in=list(), rng_seed=0, save_file='', git_check_timeout_time=1000, git_check_sleep_time=.25)
+run_in_context <- function(script='', call='', args_in=list(), rng_seed=0, save_file='', git_check_timeout_time=1000, git_check_sleep_time=.25)
 {
     # code in development for logging context info for research code
     # inspiration from Benureau (2018) Re-run, Repeat, Reproduce, Reuse, Replicate:
@@ -48,7 +48,6 @@ run_in_context <- function(script='', call=test_function, args_in=list(), rng_se
     }
     context$package_info <- packages
     context$wd <- getwd()
-    context$script <- script
 
     # get git info
     # open shell
@@ -96,6 +95,7 @@ run_in_context <- function(script='', call=test_function, args_in=list(), rng_se
         stop_quietly(msg, extra_msg)
     }
 
+    # store random seed
     context$rng_seed<-rng_seed
 
     # tidy up
@@ -104,20 +104,30 @@ run_in_context <- function(script='', call=test_function, args_in=list(), rng_se
     context$start_time<-Sys.time()
     set.seed(rng_seed)
     {
+        # if user has supplied a script run script and any chosen function
         if (nchar(script))
         {
+            context$script <- script
             source(script)
+            if (nchar(call))
+            {
+                context$call <- call
+                context$result<-do.call(call, args_in)
+            }
+        } else {
+            context$call<-'test_function'
+            context$result<-test_function()
         }
-        context$result<-do.call(call, args_in)
-        print(context)
     }
     context$end_time<-Sys.time()
     if(!nchar(save_file))
     {
-        save_file<-sprintf("Result_%s_%s_%s", script, call, context$end_time)
+        save_file<-sprintf("Result_%s_%s_%s.RData", script, call, context$end_time)
+        save_file<-gsub(':', '-', save_file)
     }
     context$save_file<-save_file
     save(context, file=save_file)
+    print(context)
 }
 
 test_function <- function()
