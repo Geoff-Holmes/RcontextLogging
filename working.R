@@ -1,4 +1,4 @@
-run_in_context <- function(script='', call=test_function, args_in=list(), rng_seed=0, git_check_timeout_time=1000, git_check_sleep_time=.25)
+run_in_context <- function(script='', call=test_function, args_in=list(), rng_seed=0, save_file='', git_check_timeout_time=1000, git_check_sleep_time=.25)
 {
     # code in development for logging context info for research code
     # inspiration from Benureau (2018) Re-run, Repeat, Reproduce, Reuse, Replicate:
@@ -112,6 +112,12 @@ run_in_context <- function(script='', call=test_function, args_in=list(), rng_se
         print(context)
     }
     context$end_time<-Sys.time()
+    if(!nchar(save_file))
+    {
+        save_file<-sprintf("Result_%s_%s_%s", script, call, context$end_time)
+    }
+    context$save_file<-save_file
+    save(context, file=save_file)
 }
 
 test_function <- function()
