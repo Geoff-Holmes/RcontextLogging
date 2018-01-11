@@ -1,5 +1,5 @@
 # code in development for logging context info for research code
-# inspiration from Benureau (2018) Re-run, Repeat, Reproduce, Reuse, Replicate: 
+# inspiration from Benureau (2018) Re-run, Repeat, Reproduce, Reuse, Replicate:
 # 	Transforming Code into Scientific Contributions
 # https://www.frontiersin.org/articles/10.3389/fninf.2017.00069/full
 #
@@ -8,7 +8,15 @@
 # 10/01/2018
 
 # library to enable interaction with git
+# install.packages("subprocess") # if not already installed
 library(subprocess)
+
+# useful function https://tolstoy.newcastle.edu.au/R/e5/help/08/11/6953.html
+stop_quietly <- function() {
+    opt <- options(show.error.messages = FALSE)
+    on.exit(options(opt))
+    stop()
+}
 
 # initialise for saving context info
 context <- list()
@@ -54,21 +62,24 @@ if (
 {
     if (tmp[2]=="") # if not clean a diff hash should show here
     {
-	context$git_status<-"working tree is confirmed clean"
-	# get current commit
-	process_write(handle, "git rev-parse HEAD\n")
-	context$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=t_out)[2]
-	if (nchar(context$git_commit_ref)!=40) {
-	    stop("git hash not stored correctly: please try again")
-	}
+    	context$git_status<-"working tree is confirmed clean"
+    	# get current commit
+    	process_write(handle, "git rev-parse HEAD\n")
+    	context$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=t_out)[2]
+    	if (nchar(context$git_commit_ref)!=40) {
+    	    cat("git hash not stored correctly: please try again")
+            stop_quietly()
+    	}
     } else {
-	stop("git is not clean: please commit first")
+    	cat("git is not clean: please commit first")
+        stop_quietly()
     }
 } else {
-    stop("git check did not complete properly: please try again")
+    cat("git check did not complete properly: please try again")
+    stop_quietly()
 }
 
-# tidy up 
+# tidy up
 rm(list=c("pc_info", "packages"))
 
 context$start_time=Sys.time()
