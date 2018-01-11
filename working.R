@@ -138,12 +138,12 @@ run_with_logging <- function(
         {
             log_info$script <- script
             source(script)
-            if (nchar(call))
-            {
-                log_info$call <- call
-                log_info$args_in <-args_in
-                log_info$result<-do.call(call, args_in)
-            }
+        }
+        if (nchar(call))
+        {
+            log_info$call <- call
+            log_info$args_in <-args_in
+            log_info$result<-do.call(call, args_in)
         } else {
             log_info$call<-'test_function'
             log_info$result<-test_function()
@@ -154,6 +154,7 @@ run_with_logging <- function(
     {
         save_file<-sprintf("Result_%s_%s_%s.RData", script, call, log_info$end_time)
         save_file<-gsub(':', '-', save_file)
+        save_file<-gsub(' ', '_', save_file)
     }
     log_info$save_file<-save_file
     save(log_info, file=save_file)
