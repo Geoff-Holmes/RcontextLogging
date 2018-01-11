@@ -108,8 +108,8 @@ run_in_context <- function(script='', call=test_function, args_in=list(), rng_se
         {
             source(script)
         }
-        result<-do.call(call, args_in)
-        print(result)
+        context$result<-do.call(call, args_in)
+        print(context)
     }
     context$end_time<-Sys.time()
 }
