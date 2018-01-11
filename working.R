@@ -58,6 +58,7 @@ process_write(handle, "git diff-index HEAD\n")
 Sys.sleep(git_check_sleep_time)
 tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
 
+error_flag=0
 # check that stout was flushed and subprocess fully completed
 if (
     tmp[1]=="git diff-index HEAD" &
@@ -69,16 +70,21 @@ if (
     	context$git_status<-"working tree is confirmed clean"
     	# get current commit
     	process_write(handle, "git rev-parse HEAD\n")
+        # give the subprocess a bit of time to complete
+        Sys.sleep(git_check_sleep_time)
     	context$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)[2]
-    	if (nchar(context$git_commit_ref)!=41) {
-    	    msg<-"git hash not stored correctly: please try again"
-            stop_quietly(msg)
+    	if (nchar(context$git_commit_ref)!=40) {
+    	    error_flag=1
     	}
     } else {
     	msg<-"git is not clean: please commit first"
         stop_quietly(msg)
     }
 } else {
+    error_flag=1
+}
+if (error_flag)
+{
     msg<-"git check did not complete properly: please try again"
     extra_msg<-"\n\nif this problem persists try adjusting variables:\ngit_check_timeout_time and / or git_check_sleep_time"
     stop_quietly(msg, extra_msg)
