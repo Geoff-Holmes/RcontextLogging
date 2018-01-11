@@ -42,15 +42,14 @@ run_with_logging <- function(
     # initialise for saving log_info info
     log_info <- list()
 
-    # get pc info
+    # get pc info as single string
     pc_info <-Sys.info()
     log_info$pc_info <-sprintf("Running on %s, %s %s %s, machine: %s, logged in as %s",
     	pc_info["sysname"],pc_info["release"],pc_info["version"],
     	pc_info["machine"],pc_info["nodename"],pc_info["user"])
 
-    # R and package info
+    # R info and working directory
     log_info$R_version<-R.version.string
-
     log_info$wd <- getwd()
 
     # get git info
@@ -117,14 +116,12 @@ run_with_logging <- function(
         stop_quietly(msg, extra_msg)
     }
 
-    # store random seed
+    # store random seed and set
     log_info$rng_seed<-rng_seed
-
-    # tidy up
-    rm(list=c("pc_info", "packages"))
-
-    log_info$start_time<-Sys.time()
     set.seed(rng_seed)
+
+    # nearly ready to roll
+    log_info$start_time<-Sys.time()
     {
         # if user has supplied a script run script and any chosen function
         if (nchar(script))
@@ -138,13 +135,14 @@ run_with_logging <- function(
             log_info$args_in <-args_in
             log_info$result<-do.call(call, args_in)
         } else {
+            # if not just call test function defined below
             log_info$call<-'test_function'
             log_info$result<-test_function()
         }
     }
     log_info$end_time<-Sys.time()
 
-    # get all curently loaded packages
+    # get info on all loaded packages
     packages <- (.packages())
     for (k in 1:length(packages)) {
         pk <- packages[k]
@@ -152,6 +150,7 @@ run_with_logging <- function(
     }
     log_info$package_info <- packages
 
+    # create unique save name if none specified
     if(!nchar(save_file))
     {
         save_file<-sprintf("Result_%s_%s_%s.RData", script, call, log_info$end_time)

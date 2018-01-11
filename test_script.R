@@ -10,7 +10,7 @@ foo<-function(...)
     my_args<-as.numeric(paste(list(...)))
     mean_args<-mean(my_args)
     fig1_save_name<-'my_fig.pdf'
-    qplot(my_args)
+    qplot(1:length(my_args), my_args)
     ggsave(fig1_save_name)
     result<-list(mean=mean_args, fig1=fig1_save_name)
 }
