@@ -84,6 +84,23 @@ run_with_logging <- function(
         if (tmp[2]=="") # if not clean a diff hash should show here
         {
         	context$git_status<-"working tree is confirmed clean"
+        	# check for untracked files
+            process_write(handle, "git status\n")
+            # give the subprocess a bit of time to complete
+            Sys.sleep(git_check_sleep_time)
+            tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
+            if (tmp[1]=="git status" &
+                gsub('[[:punct:] ]+', '', getwd())==gsub('[[:punct:] ]+', '', tmp[length(tmp)]))
+            {
+                if (tmp[3]=="Untracked files:")
+                {
+                    context$git_status=paste(context$git_status, "but there are untracked files")
+                    cat("WARNING: there are untracked files\nContinuing - but check that all used files are tracked\n")
+                    context$git_branch=tmp[2]
+                }
+            } else {
+                error_flag=1
+            }
         	# get current commit
         	process_write(handle, "git rev-parse HEAD\n")
             # give the subprocess a bit of time to complete
@@ -139,6 +156,7 @@ run_with_logging <- function(
     }
     context$save_file<-save_file
     save(context, file=save_file)
+    cat("\n")
     print(context)
 }
 
