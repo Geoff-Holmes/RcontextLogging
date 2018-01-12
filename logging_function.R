@@ -33,7 +33,6 @@ run_with_logging <- function(
     stop_quietly <- function(msg, extra_msg='') {
         opt <- options(show.error.messages = FALSE)
         on.exit(options(opt))
-        log_info$msg <<- sprintf("Aborted: %s", msg)
         cat(msg)
         cat(extra_msg)
         stop()
