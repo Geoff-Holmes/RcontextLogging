@@ -7,3 +7,5 @@
 *.Rproj
 
 *.R~
+
+\.Rhistory
