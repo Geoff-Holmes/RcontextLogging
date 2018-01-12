@@ -40,6 +40,7 @@ run_with_logging <- function(
 
     # initialise for saving log_info info
     log_info <- list()
+    xanadu   <- list()
 
     # get pc info as single string
     pc_info <-Sys.info()
@@ -137,11 +138,11 @@ run_with_logging <- function(
         {
             log_info$call <- call
             log_info$args_in <-args_in
-            log_info$result<-do.call(call, args_in)
+            xanadu$results<-do.call(call, args_in)
         } else {
             # if not just call test function defined below
             log_info$call<-'test_function'
-            log_info$result<-test_function()
+            xanadu$results<-test_function()
         }
     }
     log_info$end_time<-Sys.time()
@@ -150,7 +151,7 @@ run_with_logging <- function(
     packages <- (.packages())
     for (k in 1:length(packages)) {
         pk <- packages[k]
-        packages[k]<-sprintf("%s version %s", pk, packageVersion(pk))
+        packages[k]<-sprintf("%s : version %s", pk, packageVersion(pk))
     }
     log_info$package_info <- packages
 
@@ -162,9 +163,10 @@ run_with_logging <- function(
         save_file<-gsub(' ', '_', save_file)
     }
     log_info$save_file<-save_file
-    save(log_info, file=save_file)
+    xanadu$log_info<-log_info
+    save(xanadu, file=save_file)
     cat("\nlog_info:\n\n")
-    print(log_info)
+    print(xanadu)
 }
 
 test_function <- function()
