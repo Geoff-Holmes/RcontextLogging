@@ -86,10 +86,15 @@ run_with_logging <- function(
             {
                 if (tmp[3]=="Untracked files:")
                 {
-                    log_info$git_status=paste(log_info$git_status, "but there are untracked files")
-                    cat("WARNING: there are untracked files\nContinuing - but check that all used files are tracked\n")
-                    Sys.sleep(0.5)
-                    log_info$git_branch=tmp[2]
+                    u_in<-readline("WARNING: there are untracked files\nmake sure all used files are tracked\ndo you want to continue? : ")
+                    if (!tolower(substr(u_in,1,1))=="n")
+                    {
+                        log_info$git_status=paste(log_info$git_status, "but there are untracked files")
+                        Sys.sleep(0.5)
+                        log_info$git_branch=tmp[2]
+                    } else {
+                        stop_quietly("user aborted due to untracked files")
+                    }
                 }
             } else {
                 error_flag=1
