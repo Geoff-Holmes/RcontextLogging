@@ -162,6 +162,19 @@ run_with_logging <- function(
         save_file<-gsub(':', '-', save_file)
         save_file<-gsub(' ', '_', save_file)
     }
+    cc=0
+    while (file.exists(save_file))
+    {
+    	if (cc)
+    	{
+            inds<-unlist(gregexpr('_',save_file))
+    	    save_file<-paste(substr(save_file,1,inds[length(inds)]), as.character(cc+2),".RData", sep='')
+    	} else {
+    	    save_file<-paste(substr(save_file,1,nchar(save_file)-6), "_2.RData", sep='')
+    	}
+    	cc=cc+1
+    }
+
     log_info$save_file<-save_file
     xanadu$log_info<-log_info
     save(xanadu, file=save_file)
