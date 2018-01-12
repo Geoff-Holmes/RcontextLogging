@@ -158,26 +158,26 @@ run_with_logging <- function(
     # create unique save name if none specified
     if(!nchar(save_file))
     {
-        save_file<-sprintf("Result_%s_%s_%s.RData", script, call, log_info$end_time)
+        save_file<-sprintf("Result_%s_%s_%s", script, call, log_info$end_time)
         save_file<-gsub(':', '-', save_file)
         save_file<-gsub(' ', '_', save_file)
     }
     cc=0
-    while (file.exists(save_file))
+    while (file.exists(paste(save_file,'.rds',sep='')))
     {
     	if (cc)
     	{
             inds<-unlist(gregexpr('_',save_file))
-    	    save_file<-paste(substr(save_file,1,inds[length(inds)]), as.character(cc+2),".RData", sep='')
+    	    save_file<-paste(substr(save_file,1,inds[length(inds)]), as.character(cc+2), sep='')
     	} else {
-    	    save_file<-paste(substr(save_file,1,nchar(save_file)-6), "_2.RData", sep='')
+    	    save_file<-paste(save_file, "_2", sep='')
     	}
     	cc=cc+1
     }
 
     log_info$save_file<-save_file
     xanadu$log_info<-log_info
-    save(xanadu, file=save_file)
+    saveRDS(xanadu, file=paste(save_file,'.rds',sep=''))
     cat("\nlog_info:\n\n")
     print(xanadu)
 }
