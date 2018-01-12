@@ -4,13 +4,12 @@
 
 cat("Hello world!\nHowever, better to put everything inside a function call")
 
-foo<-function(...)
+foo<-function(N=10)
 {
     require(ggplot2)
-    my_args<-as.numeric(paste(list(...)))
-    mean_args<-mean(my_args)
+    dat<-runif(N)
     fig1_save_name<-'my_fig.pdf'
-    qplot(1:length(my_args), my_args)
+    p1<-qplot(1:N, dat)
     ggsave(fig1_save_name)
-    result<-list(mean=mean_args, fig1=fig1_save_name)
+    return(list(data=dat, fig1=p1, fig1_file=fig1_save_name))
 }
