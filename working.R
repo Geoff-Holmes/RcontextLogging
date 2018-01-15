@@ -20,7 +20,16 @@ while(gsub('[[:punct:] ]+', '', paste(getwd(), "git diff-index HEAD", sep=''))!=
 if(tmp[k+1]=='')
 {
     cat("Working tree is clean\nChecking for untracked files ...\n")
+    if(tmp[k+4]=="Untracked files:")
+    {
+        u_in<-readline("There are untracked files present : do you wish to continue? [Y/n]")
+        if(tolower(u_in)=="n")
+        {
+            stop_quietly("Aborting")
+        }
+    }
     k<-k+2
+
 } else {
     stop_quietly("Working tree is not clean")
 }
