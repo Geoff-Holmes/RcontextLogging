@@ -8,6 +8,27 @@ process_write(handle, "git diff-index HEAD\n")
 process_write(handle, "git status\n")
 process_write(handle, "git rev-parse HEAD\n")
 
+tmp<-"dummy"
+while(gsub('[[:punct:] ]+', '', getwd())!=gsub('[[:punct:] ]+', '', tmp[length(tmp)]))
+{
+    tmp<-c(tmp, read_next())
+}
+
+k<-1
+while(gsub('[[:punct:] ]+', '', paste(getwd(), "git diff-index HEAD", sep=''))!=gsub('[[:punct:] ]+', '', tmp[k]))
+{ k<-k+1}
+if(tmp[k+1]=='')
+{
+    cat("Working tree is clean\nChecking for untracked files ...\n")
+    k<-k+2
+} else {
+    stop_quietly("Working tree is not clean")
+}
+
+
+
+
+
 continue_flag <- 3
 k <- lines_read <- 0 # k and lines_read are updated globally within calls to next read
 while(continue_flag)
