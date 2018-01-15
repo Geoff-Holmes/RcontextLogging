@@ -10,5 +10,15 @@ read_next <- function()
     }
     lines_read <<- lines_read+length(tmp)
     k <<- 1
+    print(tmp)
     tmp
+}
+
+# useful function based on https://tolstoy.newcastle.edu.au/R/e5/help/08/11/6953.html
+stop_quietly <- function(msg, extra_msg='') {
+    opt <- options(show.error.messages = FALSE)
+    on.exit(options(opt))
+    cat(msg)
+    cat(extra_msg)
+    stop()
 }

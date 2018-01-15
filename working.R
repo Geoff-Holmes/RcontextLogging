@@ -8,45 +8,44 @@ process_write(handle, "git diff-index HEAD\n")
 process_write(handle, "git status\n")
 process_write(handle, "git rev-parse HEAD\n")
 
-continue_flag <- 1
-lines_read <- 0
+continue_flag <- 3
+k <- lines_read <- 0 # k and lines_read are updated globally within calls to next read
 while(continue_flag)
 {
+    cat(sprintf("Continue = %d\n", continue_flag))
     cat("\nNext while\n")
-    tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
-    k<-1
-    lines_read <- lines_read+length(tmp)
-    print(tmp)
+    tmp <- read_next()
     cat('\n')
     while (k <= length(tmp))
     {
-        if(gsub('[[:punct:] ]+', '', paste(getwd(), "git diff-index HEAD", sep=''))==gsub('[[:punct:] ]+', '', tmp[k]))
+        if (continue_flag>2)
+        # check whether working tree is clean
         {
-            print(k)
-            print(gsub('[[:punct:] ]+', '', paste(getwd(), "git diff-index HEAD", sep='')))
-            print(gsub('[[:punct:] ]+', '', tmp[k]))
-            k <- k + 1
-            if (k > length(tmp))
+            if(gsub('[[:punct:] ]+', '', paste(getwd(), "git diff-index HEAD", sep=''))==gsub('[[:punct:] ]+', '', tmp[k]))
             {
-                tmp_read_flag <- 0
-                while(!tmp_read_flag)
+                print(k)
+                print(tmp[k])
+                k <- k + 1
+                if (k > length(tmp))
                 {
-                    cat("Waiting for subprocess ...\n")
-                    tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
-                    tmp_read_flag <- length(tmp)
-                    Sys.sleep(0.1)
+                    tmp <- read_next()
                 }
-                lines_read <- lines_read+length(tmp)
-                k<-1
+                if(tmp[k]=='')
+                {
+                    cat("Working tree is clean\nChecking for untracked files ...\n")
+                    continue_flag <- continue_flag-1
+                } else {
+                    stop_quietly("Working tree is not clean")
+                }
             }
-            print(tmp[k])
-            continue_flag <- 0
-            break
-        } else {
-            print(k)
-            print(gsub('[[:punct:] ]+', '', tmp[k]))
             k <- k + 1
+        } else {
+            if (continue_flag>1)
+            # check which branch and whether there are untracked files
+            {
+                stop("Bye")
+            }
         }
     }
-    print(lines_read)
+    cat(sprtinf("\n%d lines read\n", lines_read))
 }
