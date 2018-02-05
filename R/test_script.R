@@ -2,8 +2,6 @@
 #
 # geoff.r.holmes@sheffield.ac.uk
 
-cat("Hello world!\nHowever, better to put everything inside a function call")
-
 foo<-function(N=10)
 {
     require(ggplot2)
