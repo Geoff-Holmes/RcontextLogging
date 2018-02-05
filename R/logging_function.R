@@ -29,15 +29,6 @@ run_with_logging <- function(
     # install.packages("subprocess") # if not already installed
     require(subprocess)
 
-    # useful function based on https://tolstoy.newcastle.edu.au/R/e5/help/08/11/6953.html
-    stop_quietly <- function(msg, extra_msg='') {
-        opt <- options(show.error.messages = FALSE)
-        on.exit(options(opt))
-        cat(msg)
-        cat(extra_msg)
-        stop()
-    }
-
     # initialise for saving log_info info
     log_info <- list()
     xanadu   <- list()
@@ -50,76 +41,10 @@ run_with_logging <- function(
 
     # R info and working directory
     log_info$R_version<-R.version.string
-    log_info$wd <- getwd()
+    log_info$working_dir <- getwd()
 
-    # get git info
-    # open shell
-    handle <- spawn_process("C:/Windows/System32/cmd.exe")
-    # need to add git cmd folder to PATH could make it permanent
-    # assumed git cmd folder is at C:\Program Files\Git\
-    process_write(handle, "PATH=%PATH%;C:\\Program Files\\Git\\cmd\n")
-    # flush stdout
-    tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
-    # check if git is clean
-    process_write(handle, "git diff-index HEAD\n")
-    # give the subprocess a bit of time to complete
-    Sys.sleep(git_check_sleep_time)
-    tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
-
-    error_flag=0
-    # check that stout was flushed and subprocess fully completed
-    if (
-        tmp[1]=="git diff-index HEAD" &
-        gsub('[[:punct:] ]+', '', getwd())==gsub('[[:punct:] ]+', '', tmp[length(tmp)])
-    	)
-    {
-        if (tmp[2]=="") # if not clean a diff hash should show here
-        {
-        	log_info$git_status<-"working tree is confirmed clean"
-        	# check for untracked files
-            process_write(handle, "git status\n")
-            # give the subprocess a bit of time to complete
-            Sys.sleep(git_check_sleep_time)
-            tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
-            if (tmp[1]=="git status" &
-                gsub('[[:punct:] ]+', '', getwd())==gsub('[[:punct:] ]+', '', tmp[length(tmp)]))
-            {
-                if (tmp[3]=="Untracked files:")
-                {
-                    u_in<-readline("WARNING: there are untracked files\nmake sure all used files are tracked\ndo you want to continue? : ")
-                    if (!tolower(substr(u_in,1,1))=="n")
-                    {
-                        log_info$git_status=paste(log_info$git_status, "but there are untracked files")
-                        Sys.sleep(0.5)
-                        log_info$git_branch=tmp[2]
-                    } else {
-                        stop_quietly("user aborted due to untracked files")
-                    }
-                }
-            } else {
-                error_flag=1
-            }
-        	# get current commit
-        	process_write(handle, "git rev-parse HEAD\n")
-            # give the subprocess a bit of time to complete
-            Sys.sleep(git_check_sleep_time)
-        	log_info$git_commit_ref<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)[2]
-        	if (nchar(log_info$git_commit_ref)!=40) {
-        	    error_flag=1
-        	}
-        } else {
-        	msg<-"git is not clean: please commit first"
-            stop_quietly(msg)
-        }
-    } else {
-        error_flag=1
-    }
-    if (error_flag)
-    {
-        msg<-"git check did not complete properly: please try again"
-        extra_msg<-"\n\nif this problem persists try adjusting variables:\ngit_check_timeout_time and / or git_check_sleep_time"
-        stop_quietly(msg, extra_msg)
-    }
+    # store git info
+    log_info <- c(log_info, git_check())
 
     # store random seed and set
     log_info$rng_seed<-rng_seed
@@ -177,15 +102,9 @@ run_with_logging <- function(
 
     log_info$save_file<-save_file
     xanadu$log_info<-log_info
+    class(xanadu)<-"runlog"
     saveRDS(xanadu, file=paste(save_file,'.rds',sep=''))
     cat("\nlog_info:\n\n")
     print(xanadu)
-}
-
-test_function <- function()
-{
-    msg<-"Test function called successfully!"
-    cat(paste(msg, '\n'))
-    return(msg)
 }
 
