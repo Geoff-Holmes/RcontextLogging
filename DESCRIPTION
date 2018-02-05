@@ -1,4 +1,4 @@
-Package: contextlogging
+Package: RcontextLogging
 Type: Package
 Title: Stores the result of a function call together with platform info
 Version: 0.1.0
@@ -6,6 +6,6 @@ Author: Geoffrey Robert Holmes
 Maintainer: The package maintainer <geoff.r.holmes@sheffield.ac.uk>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: MIT
 Encoding: UTF-8
 LazyData: true
