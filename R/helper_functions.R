@@ -76,6 +76,13 @@ git_check <- function()
         tmp<-process_read(handle, PIPE_STDOUT, flush=TRUE, timeout=git_check_timeout_time)
         hash<-tmp[1]
     }
+
+    tmp<-process_read(handle, PIPE_STDERR, flush=TRUE, timeout=git_check_timeout_time)
+    if(length(tmp))
+    {
+        stop_quietly("No git repository found: please create one first\n")
+    }
+
     # initialise for results
     status=list()
     cat("Working tree is clean\n") # stopped earlier if not
