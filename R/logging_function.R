@@ -58,16 +58,20 @@ run_with_logging <- function(
         {
             log_info$script <- script
             source(script)
-        }
+            flag=0 # if so don't call test_function even if no call specified
+        } else { flag=1 }
         if (nchar(call))
         {
             log_info$call <- call
             log_info$args_in <-args_in
             xanadu$results<-do.call(call, args_in)
         } else {
-            # if not just call test function defined below
-            log_info$call<-'test_function'
-            xanadu$results<-test_function()
+            if (flag)
+            {
+                # no script or function call specified so call test function defined below
+                log_info$call<-'test_function'
+                xanadu$results<-test_function()
+            }
         }
     }
     log_info$end_time<-Sys.time()
