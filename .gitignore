@@ -1,11 +1,4 @@
-
-*.swp
-
-*.un~
 .Rproj.user
-
-*.Rproj
-
-*.R~
-
-\.Rhistory
+.Rhistory
+.RData
+.Ruserdata
