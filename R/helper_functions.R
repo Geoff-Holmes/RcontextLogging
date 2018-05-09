@@ -1,3 +1,4 @@
+
 # useful function based on https://tolstoy.newcastle.edu.au/R/e5/help/08/11/6953.html
 stop_quietly <- function(msg, extra_msg='') {
     opt <- options(show.error.messages = FALSE)
@@ -10,7 +11,7 @@ stop_quietly <- function(msg, extra_msg='') {
 git_check <- function()
 {
     git_check_timeout_time=1000
-
+    untracked <- FALSE
     # open subprocess to interact with git
     if (tolower(.Platform$OS.type) == "windows")
     {
