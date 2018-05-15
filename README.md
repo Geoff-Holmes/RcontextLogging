@@ -2,11 +2,11 @@ contextlogging
 
 example usage:
 
-library(devtools)
+    library(devtools)
 
-github_install("Geoff-Holmes/RcontextLogging")
+    github_install("Geoff-Holmes/RcontextLogging")
 
-library(RcontextLogging)
+    library(RcontextLogging)
 
 \# it is assumed that you run the following within a git repo
 
@@ -14,7 +14,7 @@ library(RcontextLogging)
 
 \# run test function
 
-result<-run_with_logging()
+    result<-run_with_logging()
 
 \# result will contain a result and information about 
 
@@ -23,8 +23,8 @@ result<-run_with_logging()
 
 \# create file: test_script.R with contents ...
 
-foo<-function(N=10)
-{
+    foo<-function(N=10)
+    {
 
     require(ggplot2)
     
@@ -38,22 +38,23 @@ foo<-function(N=10)
     
     return(list(data=dat, fig1=p1, fig1_file=fig1_save_name))
     
-    \# actually there is no need to save the figure or the data separately
+    # actually there is no need to save the figure or the data separately
     
-    \# both can be recovered from the object p1 itself
+    # both can be recovered from the object p1 itself
     
-    \# get figure with: p1
+    # get figure with: p1
     
-    \# get data with layer_data(p1) or ggplot_build(p1)
+    # get data with layer_data(p1) or ggplot_build(p1)
 
 }
 
 \# log a run of the function foo in the file test_script.R
 
-result<-run_with_logging(script="test_script.R", call="foo", args_in=list(N=5))
+    result<-run_with_logging(script="test_script.R", call="foo", args_in=list(N=5))
 
 \# full call spec
 
-function (script = "", call = "", args_in = list(), rng_seed = 0, save_file = "", git_check_timeout_time = 1000, git_check_sleep_time = 0.25)
+    function (script = "", call = "", args_in = list(), rng_seed = 0, 
+            save_file = "", git_check_timeout_time = 1000, git_check_sleep_time = 0.25)
 
 
