@@ -8,7 +8,7 @@ stop_quietly <- function(msg, extra_msg='') {
     stop()
 }
 
-git_check <- function()
+git_check <- function(ignore_untracked=F)
 {
     git_check_timeout_time=1000
     untracked <- FALSE
@@ -90,13 +90,15 @@ git_check <- function()
     status$tree<-"Working tree is clean"
     if(untracked)
     {
-        u_in<-readline("There are untracked files present : do you wish to continue? [Y/n] ")
-        if(tolower(u_in)=="n")
+        if(!ignore_untracked)
         {
-            stop_quietly("Aborting")
-        } else {
-            status$tree<-paste(status$tree, ": But there are untracked files")
+            u_in<-readline("There are untracked files present : do you wish to continue? [Y/n] ")
+            if(tolower(u_in)=="n")
+            {
+                stop_quietly("Aborting")
+            }
         }
+        status$tree<-paste(status$tree, ": But there are untracked files")
     } else {
         cat("There are no untracked files\n")
         status$tree<-paste(status$tree, ": And there are no untracked files")
