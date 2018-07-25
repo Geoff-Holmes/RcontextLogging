@@ -4,6 +4,7 @@ run_with_logging <- function(
                                 args_in=list(),
                                 rng_seed=0,
                                 save_file='',
+                                ignore_untracked_files=FALSE,
                                 git_check_timeout_time=1000,
                                 git_check_sleep_time=.25
                             )
@@ -44,7 +45,7 @@ run_with_logging <- function(
     log_info$working_dir <- getwd()
 
     # store git info
-    log_info <- c(log_info, git_check())
+    log_info <- c(log_info, git_check(ignore_untracked=ignore_untracked_files))
 
     # store random seed and set
     log_info$rng_seed<-rng_seed
